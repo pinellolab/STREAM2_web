@@ -26,8 +26,7 @@ adata = st.read(file_name='./SampleData/Nestorowa_2016/Nestorowa-2016-raw.h5ad',
 adata.uns['discription'] = 'This scRNA-seq dataset contains 1656 cells and 40594 genes from mouse hematopoietic stem and progenitor cell differentiation. A single-cell resolution map of mouse hematopoietic stem and progenitor cell differentiation. Blood 128, e20-31 (2016).'
 global fig_ds
 fig_ds = st.plot_stream(adata_computed, root='S1', return_svg=True)
-global n_step
-n_step = 1
+
 
 ### Set optionals
 available_samples = ['Nestorowa, S. et al. 2016', 'Harrison, S. et al. 2021', 'Trapnell, C. et al. 2014', ' Tang, Q. et al. 2017']
@@ -56,6 +55,30 @@ header_C_ds = dbc.FormGroup([
     dbc.Col(html.Div(id='C-data-selection')),
 
     dbc.Row(html.Hr()),
+
+    dbc.Row([
+        dbc.Col(dbc.Button('<< previous step',
+                           id="C1-Previous-button",
+                           className="mb-3",
+                           color="success",
+                           disabled=True,
+                           block=True)),
+
+        dbc.Col(dbc.Button(
+            dbc.Spinner(id="C1-spinners"),
+            id="C1-Confirm-button",
+            className="mb-3",
+            color='success',
+            outline=True,
+            block=True)),
+
+        dbc.Col(dbc.Button('NEXT STEP >>',
+                           id="C1-Next-button",
+                           className="mb-3",
+                           color="success",
+                           disabled=True,
+                           block=True))
+        ])
 ])
 
 ###----- Basic layout of this Computation page -----###
@@ -70,34 +93,9 @@ layout = html.Div([
 
         dbc.Card([
             dbc.CardHeader(default_header),
-            dbc.Row([
-                dbc.Col(dbc.Button('<< previous step',
-                                   id="Previous-button",
-                                   className="mb-3",
-                                   color="success",
-                                   disabled=True,
-                                   block=True)),
-
-                dbc.Col(dbc.Button(
-                    dbc.Spinner(id="C-spinners"),
-                    id="Confirm-button",
-                    className="mb-3",
-                    color='success',
-                    outline=True,
-                    block=True)),
-
-                dbc.Col(dbc.Button('NEXT STEP >>',
-                                   id="Next-button",
-                                   className="mb-3",
-                                   color="success",
-                                   disabled=True,
-                                   block=True))
-            ]),
-
             dbc.CardBody(id="card-C-content", style={"height": "40rem"}, className="w-90"),
             dbc.CardFooter("If you like STREAM2 please support us by citing it in your work \N{TWO HEARTs}")
-        ], color="dark", inverse=True, outline=False),
-
+        ], color="dark", inverse=True, outline=False)
     ])
 ])
 
@@ -142,50 +140,28 @@ def update_ds_source(Source):
 
 @app.callback(
     [Output("card-C-content", "children"),
-     Output("C-spinners", "children"),
-     Output("Confirm-button", "disabled"),
-     Output("Next-button", "disabled")],
-    Input("Previous-button", "n_clicks"),
-    Input("Confirm-button", "n_clicks"),
-    Input("Next-button", "n_clicks"),
+     Output("C1-spinners", "children"),
+     Output("C1-Confirm-button", "disabled"),
+     Output("C1-Next-button", "disabled")],
+    Input("C1-Confirm-button", "n_clicks"),
 )
-def Update_Card_Content(n_previous,n_confirm,n_next):
-    global n_step
-    if n_next:
-        n_step = n_step + 1
-    if n_previous:
-        n_step = n_step - 1
-
-    if n_step == 1:
-        card_content = card_C_ds
-    elif n_step == 2:
-        card_content = card_C_qc_finished
-    else:
-        card_content = 'Not ready yet'
+def Update_Card_Content(n_confirm):
 
     if n_confirm:
-        return card_content, 'Successfully finished', True, False
+        time.sleep(2)
+        return card_C_ds, 'Successfully finished', True, False
+    else:
+        return 'Data is not confirmed yet! Click the CONFIRM button above to start!', 'Confirm Data', False, True
 
 @app.callback(
     Output("header_parameters", "children"),
-    Input("Previous-button", "n_clicks"),
-    Input("Confirm-button", "n_clicks"),
-    Input("Next-button", "n_clicks"),
+    Input("C1-Next-button", "n_clicks"),
 )
-def Update_Card_header(n_previous,n_confirm,n_next):
-    global n_step
+def Update_Card_header(n_next):
     if n_next:
-        n_step = n_step + 1
-    if n_previous:
-        n_step = n_step - 1
-
-    if n_step == 1:
-        card_header = header_C_ds
-    elif n_step == 2:
-        card_header = header_C_qc
+        return header_C_qc
     else:
-        card_header = 'Not ready yet'
-    return card_header
+        return header_C_ds
 
 
 ##### Card body for Data Selection
@@ -296,6 +272,8 @@ header_C_qc = dbc.FormGroup([
                  options=[{'label': i, 'value': i} for i in available_normalization],
                  value=available_normalization[0])])
     ]),
+
+    dbc.Row(html.Hr()),
 
     dbc.Row([
         dbc.Col(dbc.Button('<< previous step',

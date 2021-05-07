@@ -833,7 +833,7 @@ def remove_mt_genes(adata):
 
 def select_variable_genes(adata,loess_frac=0.01,percentile=95,n_genes = None,n_jobs = multiprocessing.cpu_count(),
                           save_fig=False,fig_name='std_vs_means.pdf',fig_path=None,fig_size=(4,4),
-                          pad=1.08,w_pad=None,h_pad=None):
+                          pad=1.08,w_pad=None,h_pad=None,return_svg=False):
 
     """Select the most variable genes.
 
@@ -861,6 +861,8 @@ def select_variable_genes(adata,loess_frac=0.01,percentile=95,n_genes = None,n_j
         Padding between the figure edge and the edges of subplots, as a fraction of the font size.
     h_pad, w_pad: `float`, optional (default: None)
         Padding (height/width) between edges of adjacent subplots, as a fraction of the font size. Defaults to pad.
+    return_svg: `bool`, optional (default: False)
+        if True, a figure in svg format will be returned.
 
     Returns
     -------
@@ -909,6 +911,12 @@ def select_variable_genes(adata,loess_frac=0.01,percentile=95,n_genes = None,n_j
     if(save_fig):
         plt.savefig(os.path.join(fig_path,fig_name),pad_inches=1,bbox_inches='tight')
         plt.close(fig)
+    if(return_svg):
+        buf = BytesIO()
+        fig.savefig(buf, format="svg")
+        # Embed the result in the html output.
+        data = base64.b64encode(buf.getbuffer()).decode("ascii")
+        return data
     return None
 
 def select_gini_genes(adata,loess_frac=0.1,percentile=95,n_genes = None,
@@ -984,7 +992,7 @@ def select_gini_genes(adata,loess_frac=0.1,percentile=95,n_genes = None,
 
 def select_top_principal_components(adata,feature=None,n_pc = 15,max_pc = 100,first_pc = False,use_precomputed=True,
                                     save_fig=False,fig_name='top_pcs.pdf',fig_path=None,fig_size=(4,4),
-                                    pad=1.08,w_pad=None,h_pad=None):
+                                    pad=1.08,w_pad=None,h_pad=None,return_svg=False):
     """Select top principal components.
     Parameters
     ----------
@@ -1015,6 +1023,8 @@ def select_top_principal_components(adata,feature=None,n_pc = 15,max_pc = 100,fi
         Padding between the figure edge and the edges of subplots, as a fraction of the font size.
     h_pad, w_pad: `float`, optional (default: None)
         Padding (height/width) between edges of adjacent subplots, as a fraction of the font size. Defaults to pad.
+    return_svg: `bool`, optional (default: False)
+        if True, a figure in svg format will be returned.
 
     Returns
     -------
@@ -1087,6 +1097,12 @@ def select_top_principal_components(adata,feature=None,n_pc = 15,max_pc = 100,fi
     if(save_fig):
         plt.savefig(os.path.join(fig_path,fig_name),pad_inches=1,bbox_inches='tight')
         plt.close(fig)
+    if(return_svg):
+        buf = BytesIO()
+        fig.savefig(buf, format="svg")
+        # Embed the result in the html output.
+        data = base64.b64encode(buf.getbuffer()).decode("ascii")
+        return data
     return None
 
 def dimension_reduction(adata,n_neighbors=50, nb_pct = None,n_components = 3,n_jobs = 1,

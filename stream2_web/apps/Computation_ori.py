@@ -45,7 +45,7 @@ layout = html.Div([
                                 tab_style={"margin-left": "auto", "margin-right": "auto"}, disabled=False),
 
                         dbc.Tab(label='2. Preprocessing', tab_id="tab-C-pre", label_style={"font-size": "17px"},
-                                tab_style={"margin-left": "auto", "margin-right": "auto"}, disabled=False),
+                                tab_style={"margin-left": "auto", "margin-right": "auto"}, disabled=True),
 
                         dbc.Tab(label='3. Dimension Reduction', tab_id="tab-C-dr", label_style={"font-size": "17px"},
                                 tab_style={"margin-left": "auto", "margin-right": "auto"}, disabled=True),
@@ -81,6 +81,18 @@ def next_page(n1, n2):
         return 'header_C_ds'
     else:
         return 'header_C_ds'
+
+
+### tab activate
+@app.callback(
+    Output("tab-C-pre", "disabled"),
+    [Input("Next1-button", "n_clicks")],
+)
+def next_page(n1):
+    if n1:
+        return False
+    else:
+        True
 
 
 @app.callback(

@@ -204,7 +204,7 @@ header_gv = dbc.FormGroup([
                 dbc.Col([dcc.Markdown("""**Branch for Diverging Gene Analysis**"""),
                          dcc.Dropdown(id='gv_branch',
                                       options=[
-                                          {'label': str(i[0][0] + '_' + i[0][1] + ' and ' + i[1][0] + '_' + i[1][1]),
+                                          {'label': 'Branch ' + str(i[0][0] + '-' + i[0][1] + ' and ' + 'Branch ' + i[1][0] + '-' + i[1][1]),
                                            'value': str(i)} for i in
                                           avaliable_divergingB],
                                       value=str(avaliable_divergingB[0]))]),
@@ -234,7 +234,7 @@ def update_gv(Source):
             dbc.Row([
                 dbc.Col([dcc.Markdown("""**Branch for Transition Gene Analysis**"""),
                          dcc.Dropdown(id='gv_branch',
-                                      options=[{'label': str(i[0] + '_' + i[1]), 'value': str(i)} for i in
+                                      options=[{'label': 'Node ' +str(i[0] + ' to Node ' + i[1]), 'value': str(i)} for i in
                                                avaliable_transitionB],
                                       value=str(avaliable_transitionB[0]))]),
                 dbc.Col([html.Div(id='gv_diverging_high')])
@@ -246,7 +246,7 @@ def update_gv(Source):
             dbc.Row([
                 dbc.Col([dcc.Markdown("""**Branch for Leaf Gene Analysis**"""),
                          dcc.Dropdown(id='gv_branch',
-                                      options=[{'label': str(i[0] + '_' + i[1]), 'value': str(i)} for i in
+                                      options=[{'label': 'Branch ' + str(i[0] + '-' + i[1]), 'value': str(i)} for i in
                                                avaliable_leafB],
                                       value=str(avaliable_leafB[0]))]),
 
@@ -260,7 +260,7 @@ def update_gv(Source):
                 dbc.Col([dcc.Markdown("""**Branch for Diverging Gene Analysis**"""),
                          dcc.Dropdown(id='gv_branch',
                                       options=[
-                                          {'label': str(i[0][0] + '_' + i[0][1] + ' and ' + i[1][0] + '_' + i[1][1]),
+                                          {'label': 'Branch ' + str(i[0][0] + '-' + i[0][1] + ' and ' + 'Branch ' + i[1][0] + '-' + i[1][1]),
                                            'value': str(i)} for i in
                                           avaliable_divergingB],
                                       value=str(avaliable_divergingB[0]))]),
@@ -278,7 +278,7 @@ def update_gv(Source):
     Input('gv_branch', 'value'))
 def update_gv(Source, Branch):
     if Source == "diverging":
-        return [{'label': str(i[0] + '_' + i[1]), 'value': str(i)} for i in eval(Branch)], str(eval(Branch)[0])
+        return [{'label': 'Branch ' + str(i[0] + '-' + i[1]), 'value': str(i)} for i in eval(Branch)], str(eval(Branch)[0])
     else:
         return None, None
 
@@ -530,16 +530,16 @@ def update_dr(gene_source, branch, high, gene):
         gene = avaliable_features[0]
 
     if gene_source == "transition":
-        data_df = adata.uns['transition_markers'][eval(branch)]
+        data_df = adata.uns['transition_markers'][eval(branch)].round(2)
 
     elif gene_source == "leaf":
-        data_df = adata.uns['leaf_markers'][eval(branch)]
+        data_df = adata.uns['leaf_markers'][eval(branch)].astype(float).round(2)
 
     elif gene_source == "diverging":
         if high == str(eval(branch)[0]):
-            data_df = adata.uns['de_markers_greater'][eval(branch)]
+            data_df = adata.uns['de_markers_greater'][eval(branch)].round(2)
         else:
-            data_df = adata.uns['de_markers_less'][eval(branch)]
+            data_df = adata.uns['de_markers_less'][eval(branch)].round(2)
 
     data_df = data_df.reset_index()
     data_df.rename(columns={'index': 'gene'}, inplace=True)
